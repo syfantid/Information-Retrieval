@@ -1,3 +1,5 @@
+package inverted_index;
+
 /**
  * Created by Sofia on 2/10/2016.
  */
