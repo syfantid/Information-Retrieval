@@ -20,7 +20,7 @@ public class FileTask implements Runnable {
      */
     public FileTask(BlockingQueue<String> queue, String filename) {
         this.queue = queue;
-        this.path = "data/" + filename;
+        this.path = "data//" + filename;
     }
 
     @Override
@@ -37,13 +37,13 @@ public class FileTask implements Runnable {
                     e.printStackTrace();
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                reader.close(); // Close file
+                if (reader != null) {
+                    reader.close(); // Close file
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
