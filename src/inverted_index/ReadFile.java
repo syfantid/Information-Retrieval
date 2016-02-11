@@ -146,13 +146,13 @@ public class ReadFile {
             filename = id + ".txt";
         }
 
-        System.out.println("Ending Inversion Process ...");
-        long elapsedTime = System.currentTimeMillis() - startTime; // The elapsed time
-        System.out.println("Inversion duration is seconds: " + elapsedTime/1000 + "\n");
-
         // Append IDFs to term files
         for(String term : n_is.keySet()) {
             writeToFile(term, (id-1)/n_is.get(term), 0); // 0 is dummy
         }
+
+        System.out.println("Ending Inversion Process ...");
+        long elapsedTime = System.currentTimeMillis() - startTime; // The elapsed time
+        System.out.println("Inversion duration is seconds: " + elapsedTime/1000 + "\n");
     }
 }
