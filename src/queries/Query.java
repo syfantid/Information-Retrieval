@@ -9,6 +9,7 @@ public class Query {
     int id;
     int top_k;
     ArrayList<String> terms;
+    int length;
 
     /**
      * Constructs the quer
@@ -20,6 +21,7 @@ public class Query {
         this.id = id;
         this.top_k = top_k;
         this.terms = terms;
+        this.length= terms.size();
     }
 
     public int getId() {
@@ -32,6 +34,10 @@ public class Query {
 
     public int getTop_k() {
         return top_k;
+    }
+
+    public int getLength() {
+        return length;
     }
 }
 

@@ -148,7 +148,7 @@ public class ReadFile {
         long startTime = System.currentTimeMillis(); // Start time of the inversion
         System.out.println("Starting Inversion Process ...");
 
-        while (new File("data2//" + filename).exists()) { // While there are more files to be processed
+        while (new File("data//" + filename).exists()) { // While there are more files to be processed
             // Thread safe BlockingQueue with a capacity of 200 lines; Used to load file to memory
             BlockingQueue<String> queue = new ArrayBlockingQueue<>(200);
             frequencies = new ConcurrentHashMap<>(); // Contains the TFs for the terms pf this document

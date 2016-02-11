@@ -1,0 +1,4 @@
+3
+1	2	nature wild
+2	3	absorb
+3	1	dog
