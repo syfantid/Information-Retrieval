@@ -29,7 +29,8 @@ public class CPUTask implements Runnable {
             try {
                 // Block if the queue is empty
                 line = queue.take();
-                line = line.replaceAll("\\p{Punct}+"," ").toLowerCase(); // Removes all punctuation, converts to lower
+                // Removes all punctuation and non-letters and converts to lower case
+                line = line.replaceAll("\\p{Punct}+"," ").toLowerCase();
                 words = line.split(" ");
                 for (String word : words) {
                     if (word.length() > 1) { // We consider 1-letter words to be stopwords e.g.a,s (from 's) etc.
@@ -43,7 +44,8 @@ public class CPUTask implements Runnable {
         // If a thread is interrupted we have to empty the queue
         // poll() returns null if the queue is empty
         while((line = queue.poll()) != null) {
-            line = line.replaceAll("\\p{Punct}+"," ").toLowerCase(); // Removes all punctuation
+            // Removes all punctuation and non-letters and converts to lower case
+            line = line.replaceAll("\\p{Punct}+"," ").toLowerCase();
             words = line.split(" ");
             for (String word : words) {
                 if (word.length() > 1) { // We consider 1-letter words to be stopwords e.g.a,s (from 's) etc.

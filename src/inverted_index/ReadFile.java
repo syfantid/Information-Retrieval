@@ -1,6 +1,7 @@
 package inverted_index;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.concurrent.*;
 
 /**
@@ -15,28 +16,39 @@ public class ReadFile {
     private static ConcurrentHashMap<String,Integer> frequencies;
     private static int maxFreq; // The maximum term frequency of the document (document level)
     private static float Ld; // The length of the document vector (to be used for normalization)
+    private static ConcurrentHashMap<String,Object> locks = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String,Object> locks2 = new ConcurrentHashMap<>();
+
 
     // Only one thread can have access to the critical area
-    public static synchronized void incrementNis(String term) {
+    public static void incrementNis(String term) {
+        locks2.putIfAbsent(term,new Object());
+        synchronized (locks2.get(term)) {
             if (n_is.containsKey(term)) {
                 int old = n_is.get(term);
                 n_is.put(term, old + 1); // Increment n_i
             } else {
                 n_is.put(term, 1); // Put the term in the list
             }
+        }
     }
 
-    public static synchronized void incrementFrequencies(String term) {
-            if(frequencies.containsKey(term)) {
+    public static void incrementFrequencies(String term) {
+        locks.putIfAbsent(term, new Object()); // Initialize lock for the term
+        synchronized (locks.get(term)) {
+            //System.out.println("Term locked: " + term + "\n");
+            if (frequencies.containsKey(term)) {
                 int newFrequency = frequencies.get(term) + 1;
-                frequencies.put(term,newFrequency); // Increment n_i
-                if(newFrequency > maxFreq) {
+                frequencies.put(term, newFrequency); // Increment n_i
+                if (newFrequency > maxFreq) {
                     maxFreq = newFrequency;
                 }
             } else {
-                frequencies.put(term,1); // Put the term in the list
+                frequencies.put(term, 1); // Put the term in the list
                 incrementNis(term);
             }
+            //System.out.println("Term unlocked: " + term + "\n");
+        }
     }
 
     private static void writeToFile(String term, int docID, int freq) {
@@ -46,7 +58,6 @@ public class ReadFile {
             fw.write(docID + "," + freq + " "); // Appends the docID and frequency to the term file
             fw.close();
         } catch(IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -79,9 +90,14 @@ public class ReadFile {
         deleteFiles(new File("index//")); // Cleaning up the index folder before we create a new index
         File f = new File("documents.txt");
         f.delete(); // Delete if it exists already
+
         int id = 1;
         String filename = "1.txt";
-        while (new File("data2//" + filename).exists()) { // While there are more files to be processed
+
+        long startTime = System.currentTimeMillis(); // Start time of the inversion
+        System.out.println("Starting Inversion Process ...");
+
+        while (new File("data//" + filename).exists()) { // While there are more files to be processed
             // Thread safe BlockingQueue with a capacity of 200 lines; Used to load file to memory
             BlockingQueue<String> queue = new ArrayBlockingQueue<>(200);
             frequencies = new ConcurrentHashMap<>();
@@ -129,6 +145,11 @@ public class ReadFile {
             id++;
             filename = id + ".txt";
         }
+
+        System.out.println("Ending Inversion Process ...");
+        long elapsedTime = System.currentTimeMillis() - startTime; // The elapsed time
+        System.out.println("Inversion duration is seconds: " + elapsedTime/1000 + "\n");
+
         // Append IDFs to term files
         for(String term : n_is.keySet()) {
             writeToFile(term, (id-1)/n_is.get(term), 0); // 0 is dummy
