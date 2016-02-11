@@ -52,12 +52,14 @@ public class ReadFile {
     }
 
     private static void writeToFile(String term, int docID, int freq) {
-        String path = "index//" + term + ".txt";
-        try {
-            FileWriter fw = new FileWriter(path,true); // True for appending the data
-            fw.write(docID + "," + freq + " "); // Appends the docID and frequency to the term file
-            fw.close();
-        } catch(IOException e) {
+        if(term.matches("[a-zA-Z]+")) { // Contains only letters
+            String path = "index//" + term + ".txt";
+            try {
+                FileWriter fw = new FileWriter(path, true); // True for appending the data
+                fw.write(docID + "," + freq + " "); // Appends the docID and frequency to the term file
+                fw.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -87,6 +89,8 @@ public class ReadFile {
             throw new IllegalArgumentException("Please pass the available number of threads as an argument.");
         }
 
+        File dir = new File("index");
+        dir.mkdir();
         deleteFiles(new File("index//")); // Cleaning up the index folder before we create a new index
         File f = new File("documents.txt");
         f.delete(); // Delete if it exists already
