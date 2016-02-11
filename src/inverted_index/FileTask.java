@@ -1,14 +1,12 @@
 package inverted_index;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 /**
  * Reads file line by line and loads it to memory to be processed
- * Created by Sofia on 2/10/2016.
  */
 public class FileTask implements Runnable {
 
@@ -22,7 +20,7 @@ public class FileTask implements Runnable {
      */
     public FileTask(BlockingQueue<String> queue, String filename) {
         this.queue = queue;
-        this.path = "data//" + filename;
+        this.path = "data2//" + filename;
     }
 
     @Override

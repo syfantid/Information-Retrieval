@@ -1,24 +1,20 @@
 package inverted_index;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The processing of a file line
- * Created by Sofia on 2/10/2016.
  */
 public class CPUTask implements Runnable {
 
-    private final BlockingQueue<String> queue;
-    private ConcurrentHashMap<String,Integer> frequencies; // Contains the frequencies of each term in the document
+    private final BlockingQueue<String> queue; // The queue that contains the lines of the document
 
     /**
      * Class constructor
      * @param queue Gets the available queue of lines at the moment the object is created
      */
-    public CPUTask(BlockingQueue<String> queue, ConcurrentHashMap<String,Integer> frequencies) {
+    public CPUTask(BlockingQueue<String> queue) {
         this.queue = queue;
-        this.frequencies = frequencies;
     }
 
     @Override
