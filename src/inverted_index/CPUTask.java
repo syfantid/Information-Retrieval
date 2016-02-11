@@ -29,7 +29,7 @@ public class CPUTask implements Runnable {
             try {
                 // Block if the queue is empty
                 line = queue.take();
-                line = line.replaceAll("\\p{Punct}+"," "); // Removes all punctuation
+                line = line.replaceAll("\\p{Punct}+"," ").toLowerCase(); // Removes all punctuation, converts to lower
                 words = line.split(" ");
                 for (String word : words) {
                     if (word.length() > 1) { // We consider 1-letter words to be stopwords e.g.a,s (from 's) etc.
@@ -40,10 +40,16 @@ public class CPUTask implements Runnable {
                 break; // FileTask has completed
             }
         }
+        // If a thread is interrupted we have to empty the queue
         // poll() returns null if the queue is empty
         while((line = queue.poll()) != null) {
-            // do things with line;
-            // TODO: 2/10/2016 Move the processing here possibly 
+            line = line.replaceAll("\\p{Punct}+"," ").toLowerCase(); // Removes all punctuation
+            words = line.split(" ");
+            for (String word : words) {
+                if (word.length() > 1) { // We consider 1-letter words to be stopwords e.g.a,s (from 's) etc.
+                    ReadFile.incrementFrequencies(word);
+                }
+            }
         }
     }
 }

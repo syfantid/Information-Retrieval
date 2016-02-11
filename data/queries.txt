@@ -1,4 +1,0 @@
-3
-1	2	nature wild
-2	1	mountain
-3	3	mud rain snow

@@ -39,8 +39,8 @@ public class ReadFile {
             }
     }
 
-    public static void writeToFile(String term, int docID, int freq) {
-        String path = "data//" + term + ".txt";
+    private static void writeToFile(String term, int docID, int freq) {
+        String path = "index//" + term + ".txt";
         try {
             FileWriter fw = new FileWriter(path,true); // True for appending the data
             fw.write(docID + "," + freq + " "); // Appends the docID and frequency to the term file
@@ -50,14 +50,20 @@ public class ReadFile {
         }
     }
 
-    public static void writeToDocFile(int docID, float Ld) {
-        String path = "data//documents.txt";
+    private static void writeToDocFile(int docID, float Ld) {
+        String path = "documents.txt";
         try {
             FileWriter fw = new FileWriter(path,true);
-            fw.write(docID + " " + maxFreq + " " + Ld + "/n");
+            fw.write(docID + " " + maxFreq + " " + Ld + "\n");
             fw.close();
         } catch(IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void deleteFiles(File dir) {
+        for (File file: dir.listFiles()) {
+            file.delete();
         }
     }
 
@@ -70,9 +76,12 @@ public class ReadFile {
             throw new IllegalArgumentException("Please pass the available number of threads as an argument.");
         }
 
+        deleteFiles(new File("index//")); // Cleaning up the index folder before we create a new index
+        File f = new File("documents.txt");
+        f.delete(); // Delete if it exists already
         int id = 1;
         String filename = "1.txt";
-        while (new File("//data", filename).exists()) { // While there are more files to be processed
+        while (new File("data2//" + filename).exists()) { // While there are more files to be processed
             // Thread safe BlockingQueue with a capacity of 200 lines; Used to load file to memory
             BlockingQueue<String> queue = new ArrayBlockingQueue<>(200);
             frequencies = new ConcurrentHashMap<>();
