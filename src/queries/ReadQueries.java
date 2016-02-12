@@ -49,20 +49,22 @@ public class ReadQueries {
 
 
             //System.out.println("Words:"+ words.toString());
+
+            //Hashmap with frequencies
+            HashMap<Integer,Double> freqs= Frequencies.getFreq();
             ArrayList<ConcurrentHashMap<Integer, Double>> listAcc = new ArrayList<>();
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             for (int i = 0; i < queries.size(); i++) {
 
                 listAcc.add(i, new ConcurrentHashMap<>());
                 for (String s : queries.get(i).getTerms()) {
-                    executor.submit(new ProcessTerm(s, listAcc.get(i)));
+                    executor.submit(new ProcessTerm(s, listAcc.get(i),freqs));
                 }
             }
             executor.shutdown();
 
             executor.awaitTermination(1, TimeUnit.DAYS);
-
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < no_of_queries; i++) {
                 System.out.println(listAcc.get(i).toString());
             }
 
