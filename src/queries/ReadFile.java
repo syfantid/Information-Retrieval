@@ -46,10 +46,10 @@ public class ReadFile {
             String line;
             try {
                 while ((line = br.readLine()) != null) {
-                    String[] splitted = line.split(" ");//Splits to tuples of (DOC_ID,FREQUENCY)
+                    String[] splitted = line.split(" "); // Splits to tuples of (DOC_ID,FREQUENCY)
                     for (int i = 0; i < splitted.length - 1; i++) {
-                        String[] commaSplit = splitted[i].split(",");//split the DOC_ID and FREQUENCY to be stored in
-                        //HashMap
+                        // Split the DOC_ID and FREQUENCY to be stored in a HashMap
+                        String[] commaSplit = splitted[i].split(",");
                         docFreq.put(Integer.parseInt(commaSplit[0]), Integer.parseInt(commaSplit[1]));
                     }
                     this.IDF = Double.parseDouble(splitted[splitted.length - 1]);

@@ -3,7 +3,7 @@ package queries;
 import java.util.ArrayList;
 
 /**
- * Implements a query. It consists of its id,numbers of returned answers and the search terms
+ * Implements a query. It consists of its id, numbers of returned answers and the search terms
  */
 public class Query {
     int id;

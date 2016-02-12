@@ -15,15 +15,15 @@ public class Frequencies {
 
     static HashMap<Integer,Double> getFreq() throws IOException {
         String path="documents.txt";
-        HashMap<Integer,Double> freq = new HashMap<>(); //Hashmap to store the ID of the document and its frequency
-        if (new File(path).exists())//checki if file exists
+        HashMap<Integer,Double> freq = new HashMap<>(); // Hashmap to store the ID of the document and its frequency
+        if (new File(path).exists()) // check if file exists
         {
             BufferedReader br= new BufferedReader(new FileReader(path));
             String line;
             try {
                 while((line= br.readLine())!=null)
                 {
-                    String[] splitted = line.split(" ");//split the line via space
+                    String[] splitted = line.split(" "); // split the line via space
                     freq.put(Integer.parseInt(splitted[0]), Double.parseDouble(splitted[1]));
                 }
             } catch (IOException e) {

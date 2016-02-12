@@ -16,8 +16,6 @@ public class ReadFile {
     private static int maxFreq;
     // Locks used for synchronization; Each locks is assigned to a term (term-level lock)
     private static ConcurrentHashMap<String,Object> locks = new ConcurrentHashMap<>();
-    // Locks used for synchronization; Each locks is assigned to a term (term-level lock)
-    private static ConcurrentHashMap<String,Object> locks2 = new ConcurrentHashMap<>();
 
     /**
      * Increments the n_i of a term (atomically)
@@ -26,15 +24,8 @@ public class ReadFile {
     public static void incrementNis(String term) {
         // Only one thread can have access to the critical area on a term level
         // Different threads working on different terms can access n_is concurrently
-        locks2.putIfAbsent(term,new Object());
-        synchronized (locks2.get(term)) {
-            if (n_is.containsKey(term)) {
-                int old = n_is.get(term);
-                n_is.put(term, old + 1); // Increment n_i by 1
-            } else {
-                n_is.put(term, 1); // Put the term in the list
-            }
-        }
+        // Compute is perfectly atomic in Java 8
+        n_is.compute(term, (k, v) -> (v == null) ? 1 : v + 1);
     }
 
     /**
@@ -194,7 +185,6 @@ public class ReadFile {
             filename = id + ".txt";
         }
 
-        // TODO: 2/11/2016 Append Ld for every document in documents.txt file (for normalization purposes)
         // Append IDFs to term files
         for(String term : n_is.keySet()) {
             writeIDFToFile(term, Math.log((id-1)/n_is.get(term)));
