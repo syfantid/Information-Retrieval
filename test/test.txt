@@ -1,4 +1,7 @@
-3
-1	2	nature wild
-2	3	absorb
+6
+1	8	nature and wild
+2	2	absorb
 3	1	dog
+4	2	hello from the other side
+5	3	fuck
+6	1	red color
