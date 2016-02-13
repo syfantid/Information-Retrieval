@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
  * Main class that reads the queries and prints the top k document ids with their score
  */
 public class ReadQueries {
-    public static void main(String args[]) throws Exception {
-        String path = "test/test.txt"; // Path of the query file
-        int threadCount = 4; // Number of threads can be added to arguments
+    public static void start(int threads,String queriesPath) {
+        String path = queriesPath; // Path of the query file
+        int threadCount = threads; // Number of threads can be added to arguments
         BufferedReader br;
         ArrayList<Query> queries; // Arraylist containing all the Query objects
         ArrayList<String> terms; // Arraylist containing the terms of a Query
@@ -22,23 +22,32 @@ public class ReadQueries {
 
         if (new File(path).exists()) { // Checks if file exists
             queries = new ArrayList<>();
-            br = new BufferedReader(new FileReader(path));
-            String line;
-            br.readLine(); // The number of queries; not needed for our approach
-            while ((line = br.readLine()) != null) {
-                String[] splitted = line.split("\\t"); // Splits the query to ID, TOP K value and Terms
-                if (splitted.length < 3) {
-                    throw new Exception("The queries file format isn't correct. Each row must be separated with tab");
+            try {
+                br = new BufferedReader(new FileReader(path));
+                String line;
+                br.readLine(); // The number of queries; not needed for our approach
+                while ((line = br.readLine()) != null) {
+                    String[] splitted = line.split("\\t"); // Splits the query to ID, TOP K value and Terms
+                    if (splitted.length < 3) {
+                        throw new Exception("The queries file format isn't correct. Each row must be separated with tab");
+                    }
+                    String[] words = splitted[2].split(" "); // Splits the terms of the query
+                    terms = new ArrayList<>();
+                    for (String s : words) {
+                        terms.add(s.toLowerCase()); // Stores the query terms to an ArrayList
+                    }
+                    // Creates and stores the Query object of the read query
+                    queries.add(new Query(Integer.parseInt(splitted[0]), Integer.parseInt(splitted[1]), terms));
                 }
-                String[] words = splitted[2].split(" "); // Splits the terms of the query
-                terms = new ArrayList<>();
-                for (String s : words) {
-                    terms.add(s.toLowerCase()); // Stores the query terms to an ArrayList
-                }
-                // Creates and stores the Query object of the read query
-                queries.add(new Query(Integer.parseInt(splitted[0]), Integer.parseInt(splitted[1]), terms));
+                br.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            br.close();
 
 
             // HashMap with the max frequencies of each document
@@ -63,7 +72,11 @@ public class ReadQueries {
             executor.shutdown();
 
             // Wait till the thread ends with a maximum of 1 Day
-            executor.awaitTermination(1, TimeUnit.DAYS);
+            try {
+                executor.awaitTermination(1, TimeUnit.DAYS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             // Prints the top k results (Documents IDs) of the each query
             for (int i = 0; i < queries.size(); i++) {
@@ -84,7 +97,7 @@ public class ReadQueries {
             System.out.println("Queries duration is seconds: " + elapsedTime/1000.00 + "\n");
 
         } else {
-            throw new FileNotFoundException("The queries with the file not found. Please Specify the file path again");
+            System.out.println("The queries' file not found. Please Specify the file path again");
 
         }
 

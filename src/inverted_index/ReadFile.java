@@ -1,7 +1,12 @@
 package inverted_index;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Loads file to memory, processes it and produces the Inverted Index files
@@ -113,16 +118,15 @@ public class ReadFile {
 
     /**
      * Creates a thread pool and synchronizes threads to produce results
-     * @param args The first argument given is the number of threads
+     * @param threads the number of threads as given by the user
+     * @param input the documents input folder
      */
-    public static void main(String[] args) {
+    public static void start(int threads,String input ) {
 
         final int threadCount; // Number of threads available
-        if (args.length > 0) {
-            threadCount = Integer.parseInt(args[0]);
-        } else {
-            throw new IllegalArgumentException("Please pass the available number of threads as an argument.");
-        }
+
+        threadCount = threads;
+
 
         // Create directory named index if it doesn't exist, where the II files will be saved
         File dir = new File("index");
@@ -134,56 +138,66 @@ public class ReadFile {
         f.delete(); // Delete if it exists already
 
         int id = 1;
-        String filename = "1.txt";
 
         long startTime = System.currentTimeMillis(); // Start time of the inversion
         System.out.println("Starting Inversion Process ...");
 
-        while (new File("data//" + filename).exists()) { // While there are more files to be processed
-            // Thread safe BlockingQueue with a capacity of 200 lines; Used to load file to memory
-            BlockingQueue<String> queue = new ArrayBlockingQueue<>(200);
-            frequencies = new ConcurrentHashMap<>(); // Contains the TFs for the terms pf this document
-            maxFreq = 1;
+        List<Path> filesInFolder=null;
+        try {
+             filesInFolder=Files.walk(Paths.get(input)).filter(Files::isRegularFile).collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (Path p:filesInFolder)// While there are more files to be processed
+        {
 
-            // Create thread pool with the given size
-            ExecutorService service = Executors.newFixedThreadPool(threadCount);
+            if (new File(p.toString()).exists())
+            {
+                // Thread safe BlockingQueue with a capacity of 200 lines; Used to load file to memory
+                BlockingQueue<String> queue = new ArrayBlockingQueue<>(200);
+                frequencies = new ConcurrentHashMap<>(); // Contains the TFs for the terms pf this document
+                maxFreq = 1;
 
-            // Give each thread a processing task
-            for (int i = 0; i < (threadCount - 1); i++) {
-                service.submit(new CPUTask(queue));
-            }
+                // Create thread pool with the given size
+                ExecutorService service = Executors.newFixedThreadPool(threadCount);
+
+                // Give each thread a processing task
+                for (int i = 0; i < (threadCount - 1); i++) {
+                    service.submit(new CPUTask(queue));
+                }
 
             /* Wait till FileTask (reading the file) completes; We use only one thread for reading the file, because
             with multiple threads you're going to have the threads causing multiple seeks as each gains control
             of the disk head, thus you won't speedup the whole process as multiple seeks cannot happen simultaneously.
             */
-            try {
-                service.submit(new FileTask(queue, filename)).get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                try {
+                    service.submit(new FileTask(queue, p.toString())).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                service.shutdownNow();  // Interrupt CPUTasks
+
+                // Wait till CPUTasks terminate
+                try {
+                    service.awaitTermination(365, TimeUnit.DAYS); // Maximum termination time, in case they don't terminate
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // End of document processing; Produce results
+                // Update the term lists
+                for(String term : frequencies.keySet()) {
+                    writeToFile(term, id, frequencies.get(term));
+                }
+                // Update the document "statistics" file
+                writeToDocFile(id,maxFreq);
+
+                // Next document
+                id++;
             }
-
-            service.shutdownNow();  // Interrupt CPUTasks
-
-            // Wait till CPUTasks terminate
-            try {
-                service.awaitTermination(365, TimeUnit.DAYS); // Maximum termination time, in case they don't terminate
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            // End of document processing; Produce results
-            // Update the term lists
-            for(String term : frequencies.keySet()) {
-                writeToFile(term, id, frequencies.get(term));
-            }
-            // Update the document "statistics" file
-            writeToDocFile(id,maxFreq);
-
-            // Next document
-            id++;
-            filename = id + ".txt";
         }
+
 
         // Append IDFs to term files
         for(String term : n_is.keySet()) {

@@ -20,7 +20,6 @@ public class ReadFile {
      */
     public ReadFile(String term) {
         this.termPath = dPath + term + ".txt";
-        System.out.println("Term: " + this.termPath);
     }
 
     /**

@@ -20,7 +20,7 @@ public class FileTask implements Runnable {
      */
     public FileTask(BlockingQueue<String> queue, String filename) {
         this.queue = queue;
-        this.path = "data//" + filename;
+        this.path = filename;
     }
 
     @Override

@@ -1,9 +1,6 @@
 package queries;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 
 
@@ -13,23 +10,31 @@ import java.util.HashMap;
 public class Frequencies {
 
 
-    static HashMap<Integer,Double> getFreq() throws IOException {
+    static HashMap<Integer,Double> getFreq() {
         String path="documents.txt";
         HashMap<Integer,Double> freq = new HashMap<>(); // Hashmap to store the ID of the document and its frequency
         if (new File(path).exists()) // check if file exists
         {
-            BufferedReader br= new BufferedReader(new FileReader(path));
-            String line;
+            BufferedReader br= null;
             try {
-                while((line= br.readLine())!=null)
-                {
-                    String[] splitted = line.split(" "); // split the line via space
-                    freq.put(Integer.parseInt(splitted[0]), Double.parseDouble(splitted[1]));
+                br = new BufferedReader(new FileReader(path));
+                String line;
+                try {
+                    while((line= br.readLine())!=null)
+                    {
+                        String[] splitted = line.split(" "); // split the line via space
+                        freq.put(Integer.parseInt(splitted[0]), Double.parseDouble(splitted[1]));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                br.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            br.close();
+
             return freq;
 
         }
