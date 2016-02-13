@@ -95,11 +95,11 @@ public class ReadFile {
      * @param docID The document, whose maximum frequency is to be written
      * @param maxFreq The maximum frequency
      */
-    private static void writeToDocFile(int docID, int maxFreq) {
+    private static void writeToDocFile(int docID, int maxFreq, double Ld) {
         String path = "documents.txt";
         try {
             FileWriter fw = new FileWriter(path,true);
-            fw.write(docID + " " + maxFreq + "\n");
+            fw.write(docID + " " + maxFreq + " " + Ld +  "\n");
             fw.close();
         } catch(IOException e) {
             e.printStackTrace();
@@ -138,6 +138,7 @@ public class ReadFile {
         f.delete(); // Delete if it exists already
 
         int id = 1;
+        int Ld; // The document vector's length
 
         long startTime = System.currentTimeMillis(); // Start time of the inversion
         System.out.println("Starting Inversion Process ...");
@@ -155,8 +156,9 @@ public class ReadFile {
             {
                 // Thread safe BlockingQueue with a capacity of 200 lines; Used to load file to memory
                 BlockingQueue<String> queue = new ArrayBlockingQueue<>(200);
-                frequencies = new ConcurrentHashMap<>(); // Contains the TFs for the terms pf this document
+                frequencies = new ConcurrentHashMap<>(); // Contains the TFs for the terms of this document
                 maxFreq = 1;
+                Ld = 0;
 
                 // Create thread pool with the given size
                 ExecutorService service = Executors.newFixedThreadPool(threadCount);
@@ -189,9 +191,10 @@ public class ReadFile {
                 // Update the term lists
                 for(String term : frequencies.keySet()) {
                     writeToFile(term, id, frequencies.get(term));
+                    Ld++; // Increment by 1 for each term in the document
                 }
                 // Update the document "statistics" file
-                writeToDocFile(id,maxFreq);
+                writeToDocFile(id,maxFreq,Math.sqrt(Ld));
 
                 // Next document
                 id++;

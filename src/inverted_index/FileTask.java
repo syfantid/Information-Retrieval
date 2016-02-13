@@ -16,11 +16,11 @@ public class FileTask implements Runnable {
     /**
      * Class constructor
      * @param queue Gets the available queue of lines at the moment the object is created
-     * @param filename The name of the file to be processed
+     * @param path The path of the file to be processed
      */
-    public FileTask(BlockingQueue<String> queue, String filename) {
+    public FileTask(BlockingQueue<String> queue, String path) {
         this.queue = queue;
-        this.path = filename;
+        this.path = path;
     }
 
     @Override
