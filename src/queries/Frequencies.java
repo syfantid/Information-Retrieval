@@ -5,14 +5,14 @@ import java.util.HashMap;
 
 
 /**
- * Gets the max frequency of each document already saved in documents.txt with a static method
+ * Gets the max frequency of each document and the LD, that are already saved in documents.txt, with a static method
  */
 public class Frequencies {
 
 
-    static HashMap<Integer,Double> getFreq() {
+    static HashMap<Integer,Freq> getFreq() {
         String path="documents.txt";
-        HashMap<Integer,Double> freq = new HashMap<>(); // Hashmap to store the ID of the document and its frequency
+        HashMap<Integer,Freq> freqs = new HashMap<>(); // Hashmap to store the ID of the document and its frequency
         if (new File(path).exists()) // check if file exists
         {
             BufferedReader br= null;
@@ -23,7 +23,8 @@ public class Frequencies {
                     while((line= br.readLine())!=null)
                     {
                         String[] splitted = line.split(" "); // split the line via space
-                        freq.put(Integer.parseInt(splitted[0]), Double.parseDouble(splitted[1]));
+                        freqs.put(Integer.parseInt(splitted[0]), new Freq(Double.parseDouble(splitted[1]),
+                                Double.parseDouble(splitted[2])));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -35,7 +36,7 @@ public class Frequencies {
                 e.printStackTrace();
             }
 
-            return freq;
+            return freqs;
 
         }
 

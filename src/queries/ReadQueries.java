@@ -51,7 +51,7 @@ public class ReadQueries {
 
 
             // HashMap with the max frequencies of each document
-            HashMap<Integer, Double> freqs = Frequencies.getFreq();
+            HashMap<Integer, Freq> freqs = Frequencies.getFreq();
 
             // Arraylist with ConcurrentHashMap (thread safe). Every hashmap represents a collection of accumulators
             ArrayList<ConcurrentHashMap<Integer, Double>> listAcc = new ArrayList<>();

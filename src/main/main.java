@@ -27,7 +27,10 @@ public class main {
             } else {
                 String dataPath = args[1];
                 String queriesPath = args[2];
+
+                //Starting inverted index
                 ReadFile.start(threads, dataPath);
+                //Starting Queries
                 ReadQueries.start(threads, queriesPath);
             }
         }
