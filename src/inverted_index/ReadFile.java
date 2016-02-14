@@ -61,10 +61,8 @@ public class ReadFile {
     private static void writeIDFToFile(String term, double IDF) {
         if(term.matches("[a-zA-Z]+")) { // Contains only letters
             String path = "index//" + term + ".txt";
-            try {
-                FileWriter fw = new FileWriter(path, true); // True for appending the data
-                fw.write(String.valueOf(IDF)); // Appends the IDF to the term file
-                fw.close();
+            try(PrintWriter outFile = new PrintWriter(new BufferedWriter(new FileWriter(path, true)))) {
+                outFile.print(String.valueOf(IDF));
             } catch (IOException e) {
                 // Do nothing
             }
@@ -80,12 +78,10 @@ public class ReadFile {
     private static void writeToFile(String term, int docID, int freq) {
         if(term.matches("[a-zA-Z]+")) { // Contains only letters
             String path = "index//" + term + ".txt";
-            try {
-                FileWriter fw = new FileWriter(path, true); // True for appending the data; Otherwise, creates file
-                fw.write(docID + "," + freq + " "); // Appends the docID and frequency to the term file
-                fw.close();
+            try(PrintWriter outFile = new PrintWriter(new BufferedWriter(new FileWriter(path, true)))) {
+                outFile.print(docID + "," + freq + " ");
             } catch (IOException e) {
-                //Do nothing
+                // Do nothing
             }
         }
     }
@@ -97,12 +93,10 @@ public class ReadFile {
      */
     private static void writeToDocFile(int docID, int maxFreq, double Ld) {
         String path = "documents.txt";
-        try {
-            FileWriter fw = new FileWriter(path,true);
-            fw.write(docID + " " + maxFreq + " " + Ld +  "\n");
-            fw.close();
-        } catch(IOException e) {
-            e.printStackTrace();
+        try(PrintWriter outFile = new PrintWriter(new BufferedWriter(new FileWriter(path, true)))) {
+            outFile.print(docID + " " + maxFreq + " " + Ld +  "\n");
+        } catch (IOException e) {
+            // Do nothing
         }
     }
 
@@ -207,7 +201,7 @@ public class ReadFile {
             writeIDFToFile(term, Math.log((id-1)/n_is.get(term)));
         }
 
-        System.out.println("Ending Inversion Process ...");
+        System.out.println("\nEnding Inversion Process ...");
         long elapsedTime = System.currentTimeMillis() - startTime; // The elapsed time
         System.out.println("Inversion duration is seconds: " + elapsedTime/1000 + "\n");
     }
